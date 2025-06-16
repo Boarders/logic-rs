@@ -4,18 +4,47 @@ use bit_vec::BitVec;
 use num_traits::ToPrimitive;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Expr<T>
-where
-    T: Clone + Eq + Hash,
-{
+pub enum BinOp {
+    Or,
+    And,
+    Imp,
+    Iff,
+}
+
+impl BinOp {
+    pub fn to_bool_op(&self) -> fn(bool, bool) -> bool {
+        match self {
+            BinOp::Or => |b1, b2| b1 || b2,
+            BinOp::And => |b1, b2| b1 && b2,
+            BinOp::Imp => |b1, b2| b1 <= b2,
+            BinOp::Iff => |b1, b2| b1 == b2,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Op<T> {
+    code: BinOp,
+    left: Expr<T>,
+    right: Expr<T>,
+}
+
+impl<T> Op<T> {
+    pub fn eval_on<S, F>(&self, ev: F, op: fn(S, S) -> S) -> S
+    where
+        F: Fn(&Expr<T>) -> S,
+    {
+        op(ev(&self.left), ev(&self.right))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Expr<T> {
     Top,
     Bot,
     Atom(T),
     Not(Box<Expr<T>>),
-    Or(Box<Expr<T>>, Box<Expr<T>>),
-    And(Box<Expr<T>>, Box<Expr<T>>),
-    // Imp(Box<Expr<T>>, Box<Expr<T>>),
-    // Iff(Box<Expr<T>>, Box<Expr<T>>),
+    BinOp(Box<Op<T>>),
 }
 
 use Expr::*;
@@ -33,8 +62,7 @@ where
                 None => panic!("variable not defined by valuation",),
             },
             Not(b) => !b.eval(valuation),
-            And(b1, b2) => b1.eval(valuation) & b2.eval(valuation),
-            Or(b1, b2) => b1.eval(valuation) | b2.eval(valuation),
+            BinOp(op) => op.eval_on(|e| e.eval(valuation), op.code.to_bool_op()),
         }
     }
 }

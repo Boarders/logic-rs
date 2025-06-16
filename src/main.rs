@@ -3,7 +3,7 @@ extern crate enum_primitive_derive;
 extern crate strum_macros;
 use bit_vec::BitVec;
 
-use logic::propositional::Expr;
+use crate::propositional::syntax::Expr;
 
 pub mod propositional;
 
@@ -18,10 +18,10 @@ fn main() {
     }
     let foo_size = Foo::COUNT;
     let bv = BitVec::from_elem(foo_size, true);
-    let ex = Expr::And(
-        Box::new(Expr::Atom(Foo::Red)),
-        Box::new(Expr::Atom(Foo::Blue)),
-    );
-    let not_ex = Expr::Not(Box::new(ex.clone()));
-    println!("{}", ex.eval(&bv));
+    // let ex = Expr::And(
+    //     Box::new(Expr::Atom(Foo::Red)),
+    //     Box::new(Expr::Atom(Foo::Blue)),
+    // );
+    // let not_ex = Expr::Not(Box::new(ex.clone()));
+    // println!("{}", ex.eval(&bv));
 }
