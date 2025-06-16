@@ -11,3 +11,13 @@ strum_macros = "0.24.3"
 bit-vec = "0.6"
 enum-primitive-derive = "0.2.2"
 num-traits = "^0.1"
+ascii_table = "4.0.3"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+
+[lib]
+name = "logic"
+path = "src/lib.rs"
